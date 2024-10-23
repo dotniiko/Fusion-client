@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { Container, Table, Button, Title, Loader, Grid } from "@mantine/core";
 import { CaretLeft } from "@phosphor-icons/react";
 import axios from "axios";
 import ViewRequestFile from "./ViewRequestFile";
 import { host } from "../../../routes/globalRoutes";
-// import { DesignationsContext } from "../helper/designationContext";
 
-function ApproveRejectRequest() {
+function ApproveRejectRequest({ setActiveTab }) {
   const role = useSelector((state) => state.user.role);
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +27,7 @@ function ApproveRejectRequest() {
       const token = localStorage.getItem("authToken");
       try {
         const response = await axios.get(
-          `${host}/iwdModuleV2/api/created-requests-view/`,
+          `${host}/iwdModuleV2/api/dean-processed-requests/`,
           {
             headers: {
               Authorization: `Token ${token}`,
@@ -86,7 +86,7 @@ function ApproveRejectRequest() {
                   <td>{request.name}</td>
                   <td>{request.description}</td>
                   <td>{request.area}</td>
-                  <td>{request["created-by"]}</td>
+                  <td>{request.requestCreatedBy}</td>
                   <td>
                     <Button
                       size="xs"
@@ -111,11 +111,17 @@ function ApproveRejectRequest() {
           >
             Back to List
           </Button>
-          <ViewRequestFile request={selectedRequest} />
+          <ViewRequestFile
+            request={selectedRequest}
+            setActiveTab={setActiveTab}
+          />
         </>
       )}
     </Container>
   );
 }
+ApproveRejectRequest.propTypes = {
+  setActiveTab: PropTypes.func.isRequired,
+};
 
 export default ApproveRejectRequest;

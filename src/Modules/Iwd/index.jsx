@@ -13,7 +13,9 @@ import ManageBudget from "./components/ManageBudget";
 import CreatedRequests from "./components/CreatedRequests";
 import ViewBudget from "./components/ViewBudget";
 import ProcessedBills from "./components/ProcessedBills";
-import ApproveRejectRequest from "./components/ApproveRejectRequestForm";
+
+import ApproveRejectRequest from "./components/ApproveRejectRequest";
+
 // import ViewRequestFile from "./components/ViewRequestFile";
 // import { DesignationsContext } from "./helper/designationContext";
 
@@ -34,10 +36,16 @@ function IwdPage() {
     { title: "Generate Final Bill", component: <FinalBillRequest /> },
     { title: "Rejected Requests", component: <RejectedRequests /> },
     { title: "Manage Budget", component: <ManageBudget /> },
-    { title: "Created Requests", component: <CreatedRequests /> },
+    {
+      title: "Created Requests",
+      component: <CreatedRequests setActiveTab={setActiveTab} />,
+    },
     { title: "View Budget", component: <ViewBudget /> },
     { title: "Processed Bills", component: <ProcessedBills /> },
-    { title: "Approve/Reject Requests", component: <ApproveRejectRequest /> },
+    {
+      title: "Approve/Reject Requests",
+      component: <ApproveRejectRequest setActiveTab={setActiveTab} />,
+    },
   ];
 
   const roleBasedTabs = {

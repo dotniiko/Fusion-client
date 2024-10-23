@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import { useForm } from "@mantine/form";
 import {
   Button,
@@ -14,39 +14,71 @@ import {
   TextInput,
 } from "@mantine/core";
 import PropTypes from "prop-types";
+import axios from "axios";
+import { host } from "../../../routes/globalRoutes";
+import { DesignationsContext } from "../helper/designationContext";
 import classes from "../iwd.module.css";
 
 function UpdateRequestForm({ selectedRequest, onBack }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const designations = useContext(DesignationsContext);
+
+  const designationsList = useMemo(
+    () =>
+      designations.map(
+        (designation) =>
+          `${designation.designation.name}|${designation.username}`,
+      ),
+    [designations],
+  );
+
   const form = useForm({
-    mode: "uncontrolled",
+    mode: "controlled",
     initialValues: {
       name: selectedRequest.name,
       description: selectedRequest.description,
       area: selectedRequest.area,
-      sendto: null,
+      designation: null,
     },
     validate: {
       name: (value) => (value ? null : "Field is required"),
       description: (value) => (value ? null : "Field is required"),
       area: (value) => (value ? null : "Field is required"),
-      sendto: (value) => (value ? null : "Field is required"),
+      designation: (value) => (value ? null : "Field is required"),
     },
   });
-  const handleSubmitButtonClick = () => {
+
+  const handleSubmitButtonClick = async () => {
     setIsLoading(true);
     setIsSuccess(false);
-    // TODO:
+    const token = localStorage.getItem("authToken");
+    const data = form.getValues();
+    data.id = selectedRequest.id;
 
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsSuccess(true);
-
+    try {
+      const response = await axios.put(
+        // change the url to the correct one
+        `${host}/iwdModuleV2/api/requests-view/${selectedRequest.id}/`,
+        data,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        },
+      );
+      console.log(response);
       setTimeout(() => {
-        onBack();
+        setIsLoading(false);
+        setIsSuccess(true);
+        setTimeout(() => {
+          onBack();
+        }, 1000);
       }, 1000);
-    }, 1000);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -92,7 +124,7 @@ function UpdateRequestForm({ selectedRequest, onBack }) {
                   classNames={classes}
                   key={form.key("name")}
                   {...form.getInputProps("name")}
-                  readOnly
+                  required
                 />
               </Flex>
 
@@ -113,7 +145,7 @@ function UpdateRequestForm({ selectedRequest, onBack }) {
               <Flex direction="column" gap="xs" justify="flex-start">
                 <TextInput
                   label="Area"
-                  placeholder="area"
+                  placeholder="Area"
                   classNames={classes}
                   key={form.key("area")}
                   {...form.getInputProps("area")}
@@ -125,12 +157,14 @@ function UpdateRequestForm({ selectedRequest, onBack }) {
                 <Select
                   mt="md"
                   comboboxProps={{ withinPortal: true }}
-                  data={["Director", "Dean", "Executive Engineer(dvijay)"]}
-                  placeholder="select"
+                  data={designationsList}
+                  placeholder="Select designation"
                   label="Send To"
                   classNames={classes}
-                  key={form.key("sendto")}
-                  {...form.getInputProps("sendto")}
+                  // purane me key: form.key("sendto")
+                  key={form.key("designation")}
+                  // purane me {...form.getInputProps("sendto")}
+                  {...form.getInputProps("designation")}
                   required
                 />
               </Flex>
@@ -148,7 +182,6 @@ function UpdateRequestForm({ selectedRequest, onBack }) {
                     border: "none",
                     borderRadius: "20px",
                   }}
-                  // onClick={handleSubmitButtonClick}
                   disabled={isLoading || isSuccess}
                 >
                   {isLoading ? (
@@ -192,7 +225,6 @@ UpdateRequestForm.propTypes = {
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
     area: PropTypes.string,
-    "created-by": PropTypes.string,
   }).isRequired,
   onBack: PropTypes.func.isRequired,
 };

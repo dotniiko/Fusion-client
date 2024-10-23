@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import { Container, Table, Button, Title, Loader, Grid } from "@mantine/core";
 import { CaretLeft } from "@phosphor-icons/react";
 import axios from "axios";
@@ -7,7 +8,7 @@ import ViewRequestFile from "./ViewRequestFile";
 import { host } from "../../../routes/globalRoutes";
 // import { DesignationsContext } from "../helper/designationContext";
 
-function CreatedRequests() {
+function CreatedRequests({ setActiveTab }) {
   const role = useSelector((state) => state.user.role);
   const [loading, setLoading] = useState(false);
 
@@ -86,7 +87,7 @@ function CreatedRequests() {
                   <td>{request.name}</td>
                   <td>{request.description}</td>
                   <td>{request.area}</td>
-                  <td>{request["created-by"]}</td>
+                  <td>{request.requestCreatedBy}</td>
                   <td>
                     <Button
                       size="xs"
@@ -111,11 +112,17 @@ function CreatedRequests() {
           >
             Back to List
           </Button>
-          <ViewRequestFile request={selectedRequest} />
+          <ViewRequestFile
+            request={selectedRequest}
+            setActiveTab={setActiveTab}
+          />
         </>
       )}
     </Container>
   );
 }
+CreatedRequests.propTypes = {
+  setActiveTab: PropTypes.func,
+};
 
 export default CreatedRequests;

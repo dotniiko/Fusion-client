@@ -36,7 +36,7 @@ function CreateRequest({ setActiveTab }) {
   );
   // console.log(designationsList);
   const form = useForm({
-    mode: "controlled",
+    mode: "uncontrolled",
     initialValues: {
       name: null,
       description: null,
